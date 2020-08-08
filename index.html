@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>PoC Javascript Device</title>
+    <script src="capture.js"></script>
 </head>
 <body>
 
@@ -24,8 +25,15 @@ sensor.onreading = () => {
 sensor.onerror = event => console.log(event.error.name, event.error.message);
     </script>
 
-<video autoplay></video> 
-<script> const constraints = { video: true }; const video = document.querySelector('video'); navigator.mediaDevices.getUserMedia(constraints). then((stream) => {video.srcObject = stream}); </script>
-
+  <div class="camera">
+    <video id="video">Video stream not available.</video>
+    <button id="startbutton">Take photo</button> 
+  </div>
+  <canvas id="canvas">
+  </canvas>
+  <div class="output">
+    <img id="photo" alt="The screen capture will appear in this box."> 
+  </div>
+    
 </body>
 </html>
