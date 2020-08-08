@@ -12,18 +12,18 @@
 
     <div id='accel'>Static stuff</div>
     <div id="magneto">Static stuff</div>
-    <script>window.addEventListener('deviceorientation', function(event) {
-    document.getElementById("accel").innerText = event.alpha + ' : ' + event.beta + ' : ' + event.gamma
-    });
+    <script>
+        window.addEventListener('deviceorientation', function(event) {
+            document.getElementById("accel").innerText = event.alpha + ' : ' + event.beta + ' : ' + event.gamma
+        });
 
-    let sensor = new Accelerometer();
-sensor.start();
+        let sensor = new Accelerometer();
+        sensor.start();
 
-sensor.onreading = () => {
-    document.getElementById("magneto").innerText = "x: " + sensor.x + " y: " + sensor.y + " z: " + sensor.z
-}
-
-sensor.onerror = event => console.log(event.error.name, event.error.message);
+        sensor.onreading = () => {
+            document.getElementById("magneto").innerText = "x: " + sensor.x + " y: " + sensor.y + " z: " + sensor.z
+        }
+        sensor.onerror = event => console.log(event.error.name, event.error.message);
     </script>
 
   <div class="camera">
