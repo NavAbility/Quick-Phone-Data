@@ -9,6 +9,20 @@
     <script src='apriltag.js'></script>
     <script src="detector.js"></script>
     <script src="capture.js"></script>
+    <script src='auth.js'></script>
+    <script>
+      //Redirect to auth if the user has not logged in.
+      function checkAuth() {
+        console.log("Checking auth");
+        // TODO: Check with Cognito that the tokens are valid.
+        if (getAuthToken() == null) {
+          window.location = getLoginUrl();
+        }
+      }
+
+      window.addEventListener('load', checkAuth, false);
+
+    </script>
 </head>
 <body>
   <script>

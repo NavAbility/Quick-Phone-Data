@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PoC Javascript Device</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src='../auth.js'></script>
+    <script>
+      //Redirect to auth if the user has not logged in.
+      function checkAuth() {
+        // Well this is weird, but ok...
+        // Sure it's a configuration thing in Cognito.
+        rawUrl = window.location.href;
+        url = new URL(rawUrl.replace("/#", "?"));
+        var urlParams = new URLSearchParams(url.search);
+
+        if (urlParams.has('id_token') && urlParams.has('access_token')) {
+          //TODO: Validate tokens with Cognito.
+          setAuthToken(urlParams.get('access_token'));
+          setIdToken(urlParams.get('id_token'));
+        }
+        gotoOrigin();
+      }
+
+      function gotoOrigin() {
+        rawUrl = window.location.href;
+        url = new URL(rawUrl.replace("/#", "?"));
+        window.location = url.origin;
+      }
+      window.addEventListener('load', checkAuth, false);
+    </script>
+</head>
+<body>
+    <h1>Successful Login</h1>
+    If you're not redirected automatically please click <a href="javascript:gotoOrigin()">here</a>.
+</body>
+</html>
