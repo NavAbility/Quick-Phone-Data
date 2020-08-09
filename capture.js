@@ -16,14 +16,17 @@
 
   var video = null;
   var canvas = null;
-  var photo = null;
   var startbutton = null;
+
+  var detector = AprilTags();
+
+  var timer = null;
 
   function startup() {
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
-    photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
+    stopbutton = document.getElementById('stopbutton');
 
     navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then(function(stream) {
@@ -37,14 +40,14 @@
     video.addEventListener('canplay', function(ev){
       if (!streaming) {
         height = video.videoHeight / (video.videoWidth/width);
-      
+
         // Firefox currently has a bug where the height can't be read from
         // the video, so we will make assumptions if this happens.
-      
+
         if (isNaN(height)) {
           height = width / (4/3);
         }
-      
+
         video.setAttribute('width', width);
         video.setAttribute('height', height);
         canvas.setAttribute('width', width);
@@ -54,42 +57,68 @@
     }, false);
 
     startbutton.addEventListener('click', function(ev){
-      takepicture();
+      startDetections();
       ev.preventDefault();
     }, false);
-    
-    clearphoto();
+    stopbutton.addEventListener('click', function(ev){
+      stopDetections();
+      ev.preventDefault();
+    }, false);
   }
 
-  // Fill the photo with an indication that none has been
-  // captured.
+  // Draw the detections.
 
-  function clearphoto() {
+  function drawDetections(detections) {
     var context = canvas.getContext('2d');
-    context.fillStyle = "#AAA";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    // Set the stroke style
+    var gradient = context.createLinearGradient(0, 0, 170, 0);
+    gradient.addColorStop("0", "green");
+    gradient.addColorStop("0.5" ,"red");
+    gradient.addColorStop("1.0", "yellow");
+    context.strokeStyle = gradient;
+    context.lineWidth = 3;
+    context.font = "14px Arial";
 
-    var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
+    context.fillStyle = "#FF0000";
+    for (index in detections) {
+      d = detections[index];
+      console.log(d);
+      context.beginPath();
+      context.moveTo(d['x1'], d['y1']);
+      context.lineTo(d['x2'], d['y2']);
+      context.lineTo(d['x3'], d['y3']);
+      context.lineTo(d['x4'], d['y4']);
+      context.closePath();
+      context.stroke();
+
+      context.fillText("Tag " + d['id'].toString(), d['x3'], d['y3']);
+    }
   }
-  
-  // Capture a photo by fetching the current contents of the video
-  // and drawing it into a canvas, then converting that to a PNG
-  // format data URL. By drawing it on an offscreen canvas and then
-  // drawing that to the screen, we can change its size and/or apply
-  // other changes before drawing it.
+
+  var detections = [];
 
   function takepicture() {
     var context = canvas.getContext('2d');
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
+      context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(video, 0, 0, width, height);
-    
-      var data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
-    } else {
-      clearphoto();
+
+      // Do AprilTags detections
+      detections = detector(canvas);
+      // console.log(detections);
+      drawDetections(detections);
+    }
+  }
+
+  function startDetections() {
+    timer = window.setInterval(takepicture, 500);
+  }
+
+  function stopDetections() {
+    if (timer != null) {
+      clearInterval(timer);
     }
   }
 

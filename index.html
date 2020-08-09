@@ -2,39 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PoC Javascript Device</title>
-    <script src="capture.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src='apriltag.js'></script>
+    <script src="detector.js"></script>
+    <script src="capture.js"></script>
 </head>
 <body>
+  <script>
+      //TODO: Refactor to use Generic Sensor API...
+      window.addEventListener('deviceorientation', function(event) {
+          document.getElementById("accel").innerText = "Accel: [" + event.alpha + ', ' + event.beta + ', ' + event.gamma + "]"
+      });
 
-    <div id='accel'>Static stuff</div>
-    <div id="magneto">Static stuff</div>
-    <script>
-        window.addEventListener('deviceorientation', function(event) {
-            document.getElementById("accel").innerText = event.alpha + ' : ' + event.beta + ' : ' + event.gamma
-        });
+      let sensor = new Accelerometer();
+      sensor.start();
 
-        let sensor = new Accelerometer();
-        sensor.start();
+      sensor.onreading = () => {
+          document.getElementById("magneto").innerText = "Mag: [" + sensor.x + ", " + sensor.y + ", " + sensor.z + "]"
+      }
+      sensor.onerror = event => console.log(event.error.name, event.error.message);
+  </script>
 
-        sensor.onreading = () => {
-            document.getElementById("magneto").innerText = "x: " + sensor.x + " y: " + sensor.y + " z: " + sensor.z
-        }
-        sensor.onerror = event => console.log(event.error.name, event.error.message);
-    </script>
-
-  <div class="camera">
-    <video id="video">Video stream not available.</video>
-    <button id="startbutton">Take photo</button> 
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div id='accel' class="alert alert-info" role="alert">Accel: [0, 0, 0]</div>
+      </div>
+      <div class="col-sm">
+        <div id="magneto" class="alert alert-info" role="alert">Mag: [0, 0, 0]</div>
+    </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <video id="video">Video stream not available.</video>
+      </div>
+      <div class="col-sm">
+        <canvas id="canvas">
+      </div>
+      </canvas>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <button id="startbutton" class="btn btn-primary btn-block">Start Detections</button>
+      </div>
+      <div class="col-sm">
+        <button id="stopbutton" class="btn btn-danger btn-block">Stop Detections</button>
+      </div>
+    </div>
   </div>
-  <canvas id="canvas">
-  </canvas>
-  <div class="output">
-    <img id="photo" alt="The screen capture will appear in this box."> 
-  </div>
-    
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 </body>
 </html>
